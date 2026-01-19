@@ -255,6 +255,74 @@
             main { padding-bottom: 90px; }
             .grid-2 { grid-template-columns: 1fr; }
         }
+
+        /* --- PRINT STYLES (NEW) --- */
+        @media print {
+            @page { margin: 1cm; size: A4; }
+            
+            body { 
+                background-color: white !important; 
+                color: black !important; 
+                height: auto; 
+                overflow: visible;
+                display: block;
+            }
+
+            aside { display: none !important; }
+            
+            main { 
+                padding: 0 !important; 
+                overflow: visible !important; 
+                width: 100%;
+                margin: 0;
+            }
+
+            .card { 
+                box-shadow: none !important; 
+                border: 1px solid #ccc !important; 
+                break-inside: avoid; 
+                page-break-inside: avoid;
+                margin-bottom: 20px;
+            }
+
+            .btn, .modal-overlay, #toast-container { display: none !important; }
+
+            /* Print Header */
+            section { margin-bottom: 40px; }
+            
+            table { 
+                width: 100%; 
+                border: 1px solid #ccc; 
+            }
+            th { 
+                background-color: #f0f0f0 !important; 
+                color: black !important; 
+                border: 1px solid #ccc;
+            }
+            td { 
+                border: 1px solid #ccc; 
+                color: black !important; 
+            }
+
+            /* Ensure text contrast */
+            .text-light { color: #555 !important; }
+            h1, h2, h3 { color: black !important; }
+            
+            /* Adjust layout for grid cards in print */
+            .grid-2, .grid-4 {
+                display: block; /* Stack cards vertically for print */
+            }
+            .card {
+                width: 100%;
+                border: 1px solid #ccc;
+                margin-bottom: 15px;
+            }
+
+            /* Page breaks for tables */
+            tr { page-break-inside: avoid; page-break-after: auto; }
+            thead { display: table-header-group; }
+            tfoot { display: table-footer-group; }
+        }
     </style>
 </head>
 <body>
@@ -289,6 +357,8 @@
                     <p>Fundraising status for <strong>DCD Possess The Land</strong></p>
                 </div>
                 <div style="display: flex; gap: 10px;">
+                    <!-- PRINT BUTTON -->
+                    <button class="btn btn-secondary" onclick="window.print()" title="Print Report">🖨️ Print</button>
                     <button class="btn btn-secondary" onclick="app.openModal('manual-cash')">💵 Manual Cash</button>
                     <button class="btn btn-primary" onclick="app.openModal('sms-parse')">⚡ SMS Parser</button>
                     <button class="btn btn-primary" style="background: var(--secondary);" onclick="app.openModal('pledge')">+ New Pledge</button>
@@ -346,6 +416,8 @@
             <div class="flex-between" style="margin-bottom: 24px;">
                 <h1>Member Pledges</h1>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <!-- PRINT BUTTON -->
+                    <button class="btn btn-secondary" onclick="window.print()" title="Print Pledges List">🖨️ Print</button>
                     <button class="btn btn-secondary" onclick="document.getElementById('csv-upload').click()">📂 Import CSV</button>
                     <input type="file" id="csv-upload" accept=".csv" style="display: none;" onchange="app.handleCSVUpload(this)">
                     
@@ -368,7 +440,7 @@
                                 <th class="text-right">Paid</th>
                                 <th class="text-right">Balance</th>
                                 <th class="text-right">Status</th>
-                                <th style="width: 80px;"></th>
+                                <th style="width: 80px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="pledges-table-body">
@@ -384,6 +456,8 @@
             <div class="flex-between" style="margin-bottom: 24px;">
                 <h1>Expenses Tracker</h1>
                 <div style="display: flex; gap: 10px;">
+                    <!-- PRINT BUTTON -->
+                    <button class="btn btn-secondary" onclick="window.print()" title="Print Expenses">🖨️ Print</button>
                     <button class="btn btn-danger" onclick="app.openModal('expense')">📉 Record Expense</button>
                     <button class="btn btn-secondary" onclick="app.exportCSV('expenses')">📥 Export</button>
                 </div>
@@ -413,7 +487,11 @@
         <section id="view-ledger" class="hidden">
             <div class="flex-between" style="margin-bottom:  24px;">
                 <h1>Transaction Ledger (Net)</h1>
-                <button class="btn btn-secondary" onclick="app.exportCSV('ledger')">📥 Export Audit</button>
+                <div style="display: flex; gap: 10px;">
+                    <!-- PRINT BUTTON -->
+                    <button class="btn btn-secondary" onclick="window.print()" title="Print Ledger">🖨️ Print</button>
+                    <button class="btn btn-secondary" onclick="app.exportCSV('ledger')">📥 Export Audit</button>
+                </div>
             </div>
 
             <div class="card">
@@ -438,7 +516,11 @@
 
         <!-- TRIBES VIEW -->
         <section id="view-tribes" class="hidden">
-            <h1>Department Performance</h1>
+            <div class="flex-between" style="margin-bottom: 24px;">
+                <h1>Department Performance</h1>
+                <!-- PRINT BUTTON -->
+                <button class="btn btn-secondary" onclick="window.print()" title="Print Report">🖨️ Print</button>
+            </div>
             <div id="tribes-container" class="grid-2" style="margin-top: 24px;">
                 <!-- JS Injected -->
             </div>
@@ -451,7 +533,7 @@
             <!-- FEATURE 1: BACKUP & RESTORE -->
             <div class="card">
                 <h3>Backup & Restore</h3>
-                <p class="text-light" style="margin-bottom: 16px;">Save the entire database (pledges, transactions, custom departments) to a file.</p>
+                <p class="text-light" style="margin-bottom: 16px;">Save entire database (pledges, transactions, custom departments) to a file.</p>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <button class="btn btn-primary" onclick="app.downloadBackup()">💾 Download Backup</button>
                     
@@ -676,7 +758,7 @@
             "Kingdom Generation", "Planning Committee", "Guests"
         ];
         const DEPT_STORAGE_KEY = 'dcd_custom_departments';
-        const DB_KEY = 'dcd_possess_land_v18';
+        const DB_KEY = 'dcd_possess_land_v19';
 
         // --- SECURITY UTILS ---
         function escapeHtml(unsafe) {
@@ -817,7 +899,7 @@
                 if (pledge) {
                     const txCount = this.data.transactions.filter(t => t.pledgeId === id).length;
                     if (txCount > 0) {
-                        const proceed = confirm(`This pledge has ${txCount} payments. Deleting it will remove them from the ledger. Continue?`);
+                        const proceed = confirm(`This pledge has ${txCount} payments. Deleting it will remove them from ledger. Continue?`);
                         if (!proceed) return;
                     }
                 }
@@ -1124,17 +1206,14 @@
                     try {
                         const json = JSON.parse(e.target.result);
                         
-                        // Basic validation
                         if(!json.departments || !json.data) {
                             throw new Error("Invalid backup file format");
                         }
 
                         if(confirm("Restoring will OVERWRITE your current data and departments. This cannot be undone. Proceed?")) {
-                            // Restore Departments
                             DeptManager.list = json.departments;
                             DeptManager.save();
 
-                            // Restore Data
                             store.data = json.data;
                             store.save();
 
@@ -1147,7 +1226,6 @@
                     }
                 };
                 reader.readAsText(file);
-                // Reset input so same file can be selected again if needed
                 input.value = '';
             },
 
