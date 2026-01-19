@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCD Possess The Land | Fundraising Dashboard</title>
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --primary: #059669;       /* Emerald Green */
+            --primary-dark: #064E3B;
+            --primary-light: #D1FAE5;
+            --secondary: #3B82F6;     /* Blue */
+            --accent: #F59E0B;        /* Amber */
+            --danger: #EF4444;        /* Red */
+            --bg: #F3F4F6;
+            --surface: #FFFFFF;
+            --sidebar-bg: #111827;
+            --text-main: #1F2937;
+            --text-light: #6B7280;
+            --border: #E5E7EB;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        
+        body { 
+            background-color: var(--bg); 
+            color: var(--text-main); 
+            display: flex; 
+            height: 100vh; 
+            overflow: hidden;
+        }
+
+        /* --- LAYOUT --- */
+        aside {
+            width: 260px;
+            background: var(--sidebar-bg);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 50;
+        }
+
+        main { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 32px; 
+            scroll-behavior: smooth;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- NAVIGATION --- */
+        .brand { 
+            font-size: 1.25rem; 
+            font-weight: 800; 
+            margin-bottom: 40px; 
+            color: var(--primary); 
+            line-height: 1.2;
+            display: flex; 
+            align-items: center; 
+            gap: 10px;
+        }
+        
+        .nav-group { display: flex; flex-direction: column; gap: 4px; }
+        
+        .nav-item { 
+            padding: 12px 16px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            color: #9CA3AF; 
+            transition: all 0.2s; 
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 10;
+        }
+        .nav-item:hover { background: #374151; color: white; }
+        .nav-item.active { background: var(--primary); color: white; font-weight: 600; }
+
+        /* --- TYPOGRAPHY & COMPONENTS --- */
+        h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; color: #111827; }
+        h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 16px; }
+        h3 { font-size: 1rem; font-weight: 600; margin-bottom: 12px; color: var(--text-main); }
+        p { color: var(--text-light); font-size: 0.95rem; line-height: 1.5; }
+        
+        .card { 
+            background: var(--surface); 
+            padding: 24px; 
+            border-radius: var(--radius); 
+            border: 1px solid var(--border); 
+            box-shadow: var(--shadow-sm); 
+            margin-bottom: 24px;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            justify-content: center;
+            position: relative;
+            z-index: 20;
+        }
+        .btn:active { transform: translateY(1px); }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: white; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-secondary:hover { background: #F9FAFB; border-color: #D1D5DB; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #DC2626; }
+        .btn-sm { padding: 6px 12px; font-size:  0.8rem; }
+        .btn-block { width: 100%; }
+        .btn-icon { font-size: 1rem; background: none; border: none; cursor: pointer; }
+
+        /* Forms */
+        input, select, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            margin-bottom: 16px; 
+            font-size: 0.95rem;
+            background: #fff;
+            transition: border 0.2s;
+        }
+        input:focus, select:focus, textarea:focus { 
+            outline: none; 
+            border-color: var(--primary); 
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+        label { display: block; font-weight: 500; font-size: 0.85rem; margin-bottom: 6px; color: #374151; }
+
+        /* Tables */
+        .table-container { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; background: white; min-width: 600px; }
+        th, td { padding: 14px 20px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        th { background: #F9FAFB; color: var(--text-light); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+        tr:last-child td { border-bottom: none; }
+        .money { font-family: 'Courier New', Courier, monospace; font-weight: 700; letter-spacing: -0.5px; }
+        .money-negative { color: var(--danger); }
+        
+        /* Badges */
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
+        .badge-success { background: var(--primary-light); color: var(--primary-dark); }
+        .badge-warn { background: #FEF3C7; color: #92400E; }
+        .badge-danger { background: #FEE2E2; color: var(--danger); }
+
+        /* Progress Bars */
+        .progress-wrapper { margin-bottom: 12px; }
+        .progress-info { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9rem; font-weight: 500; }
+        .progress-track { background: #E5E7EB; height:  10px; border-radius: 5px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .progress-fill.warn { background: var(--accent); }
+        .progress-fill.danger { background: var(--danger); }
+
+        /* --- MODAL SYSTEM --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); 
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 2000;
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .modal-overlay.open { display: flex; opacity: 1; }
+        
+        .modal { 
+            background: white; 
+            width: 90%; 
+            max-width: 500px; 
+            padding: 0; 
+            border-radius: 16px; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: scale(0.95);
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+            position: relative;
+            z-index: 2001;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-overlay.open .modal { transform: scale(1); }
+        .modal-lg { max-width: 800px; }
+
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #F9FAFB; }
+        .modal-header h3 { margin: 0; }
+        .modal-body { padding: 24px; max-height: 70vh; overflow-y: auto; }
+        .modal-footer { padding: 16px 24px; background: #F9FAFB; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; }
+
+        .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-light); line-height: 1; }
+        
+        /* Toast Notifications */
+        #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 3000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { 
+            background: #1F2937; color: white; padding: 12px 20px; border-radius: 8px; 
+            box-shadow: var(--shadow-md); font-size: 0.9rem; 
+            transform: translateX(100%); transition: transform 0.3s ease;
+            display: flex; align-items: center; gap: 10px; pointer-events: auto;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left: 4px solid var(--primary); }
+        .toast.error { border-left: 4px solid var(--danger); }
+
+        /* Helpers */
+        .hidden { display: none !important; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .text-right { text-align: right; }
+        .w-full { width: 100%; }
+        .input-group { margin-bottom: 12px; }
+        .input-group label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 0.8rem; }
+
+        /* --- MOBILE --- */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            aside { 
+                width: 100%; 
+                height: auto; 
+                flex-direction: row; 
+                padding: 12px 20px; 
+                justify-content: space-between; 
+                position: fixed; 
+                bottom: 0; 
+                top: auto; 
+                border-top: 1px solid var(--border); 
+                background: white; 
+                color: var(--text-main);
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+                z-index: 1000;
+            }
+            .brand { display: none; }
+            .nav-group { flex-direction: row; justify-content: space-between; width: 100%; }
+            .nav-item { flex-direction: column; gap: 4px; padding: 8px; font-size: 0.7rem; text-align: center; }
+            main { padding-bottom: 90px; }
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside>
+        <div class="brand">
+            <span>🏝️</span>
+            <div>
+                <div>DCD</div>
+                <div style="font-size: 0.8rem; font-weight: 500; color: #9CA3AF; letter-spacing: 1px;">POSSESS THE LAND</div>
+            </div>
+        </div>
+        <nav class="nav-group">
+            <div class="nav-item active" onclick="app.router('dashboard')">📊 Dashboard</div>
+            <div class="nav-item" onclick="app.router('pledges')">🤝 Pledges</div>
+            <div class="nav-item" onclick="app.router('ledger')">💰 Ledger</div>
+            <div class="nav-item" onclick="app.router('expenses')">📉 Expenses</div>
+            <div class="nav-item" onclick="app.router('tribes')">🏆 Tribes</div>
+            <div class="nav-item" onclick="app.router('settings')">⚙️ Settings</div>
+        </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main id="main-container">
+        
+        <!-- DASHBOARD -->
+        <section id="view-dashboard">
+            <div class="flex-between" style="margin-bottom: 24px;">
+                <div>
+                    <h1>Project Overview</h1>
+                    <p>Fundraising status for <strong>DCD Possess The Land</strong></p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-secondary" onclick="app.openModal('manual-cash')">💵 Manual Cash</button>
+                    <button class="btn btn-primary" onclick="app.openModal('sms-parse')">⚡ SMS Parser</button>
+                    <button class="btn btn-primary" style="background: var(--secondary);" onclick="app.openModal('pledge')">+ New Pledge</button>
+                </div>
+            </div>
+
+            <!-- KPI CARDS -->
+            <div class="grid-4">
+                <div class="card">
+                    <p class="text-light">Gross Cash</p>
+                    <h2 class="text-success" style="color: var(--primary); font-size: 2rem;" id="dash-cash">KES 0</h2>
+                </div>
+                <div class="card">
+                    <p class="text-light">Expenses</p>
+                    <h2 class="text-danger" style="font-size: 2rem;" id="dash-expenses">KES 0</h2>
+                </div>
+                <div class="card">
+                    <p class="text-light">Net Cash (On Hand)</p>
+                    <h2 class="text-secondary" style="color: var(--secondary); font-size: 2rem;" id="dash-net">KES 0</h2>
+                </div>
+                <div class="card">
+                    <p class="text-light">Total Pledges</p>
+                    <h2 style="color: var(--secondary); font-size: 2rem;" id="dash-pledges">KES 0</h2>
+                </div>
+                <div class="card">
+                    <p class="text-light">Cash Efficiency</p>
+                    <h2 id="dash-rate">0%</h2>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- PHASE PROGRESS -->
+                <div class="card">
+                    <div class="flex-between">
+                        <h3>Collection Phases</h3>
+                        <button class="btn btn-sm btn-secondary" onclick="app.router('settings')">Edit</button>
+                    </div>
+                    <div id="phase-list" style="margin-top: 16px;">
+                        <!-- JS Injected -->
+                    </div>
+                </div>
+
+                <!-- RECENT ACTIVITY -->
+                <div class="card">
+                    <h3>Recent Transactions</h3>
+                    <div id="recent-activity" style="margin-top: 16px; display: flex; flex-direction: column; gap: 12px;">
+                        <p class="text-light" style="text-align: center; padding: 20px;">No recent activity.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PLEDGES VIEW -->
+        <section id="view-pledges" class="hidden">
+            <div class="flex-between" style="margin-bottom: 24px;">
+                <h1>Member Pledges</h1>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-secondary" onclick="document.getElementById('csv-upload').click()">📂 Import CSV</button>
+                    <input type="file" id="csv-upload" accept=".csv" style="display: none;" onchange="app.handleCSVUpload(this)">
+                    
+                    <button class="btn btn-secondary" onclick="app.exportCSV('pledges')">📥 Export</button>
+                    <button class="btn btn-primary" onclick="app.openModal('pledge')">+ New Pledge</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div style="margin-bottom: 16px;">
+                    <input type="text" id="pledge-search" placeholder="Search by name..." onkeyup="app.renderPledges()">
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Member Name</th>
+                                <th>Department</th>
+                                <th class="text-right">Pledged</th>
+                                <th class="text-right">Paid</th>
+                                <th class="text-right">Balance</th>
+                                <th class="text-right">Status</th>
+                                <th style="width: 80px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="pledges-table-body">
+                            <!-- JS Injected -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- EXPENSES VIEW -->
+        <section id="view-expenses" class="hidden">
+            <div class="flex-between" style="margin-bottom: 24px;">
+                <h1>Expenses Tracker</h1>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-danger" onclick="app.openModal('expense')">📉 Record Expense</button>
+                    <button class="btn btn-secondary" onclick="app.exportCSV('expenses')">📥 Export</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th class="text-right">Amount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expenses-table-body">
+                            <!-- JS Injected -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEDGER VIEW -->
+        <section id="view-ledger" class="hidden">
+            <div class="flex-between" style="margin-bottom:  24px;">
+                <h1>Transaction Ledger (Net)</h1>
+                <button class="btn btn-secondary" onclick="app.exportCSV('ledger')">📥 Export Audit</button>
+            </div>
+
+            <div class="card">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Reference</th>
+                                <th>Name/Description</th>
+                                <th>Type</th>
+                                <th class="text-right">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ledger-table-body">
+                            <!-- JS Injected -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TRIBES VIEW -->
+        <section id="view-tribes" class="hidden">
+            <h1>Department Performance</h1>
+            <div id="tribes-container" class="grid-2" style="margin-top: 24px;">
+                <!-- JS Injected -->
+            </div>
+        </section>
+
+        <!-- SETTINGS VIEW -->
+        <section id="view-settings" class="hidden">
+            <h1>Admin Settings</h1>
+            
+            <!-- FEATURE 1: BACKUP & RESTORE -->
+            <div class="card">
+                <h3>Backup & Restore</h3>
+                <p class="text-light" style="margin-bottom: 16px;">Save the entire database (pledges, transactions, custom departments) to a file.</p>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="app.downloadBackup()">💾 Download Backup</button>
+                    
+                    <button class="btn btn-secondary" onclick="document.getElementById('restore-input').click()">📂 Restore Backup</button>
+                    <input type="file" id="restore-input" accept=".json" style="display: none;" onchange="app.restoreBackup(this)">
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Manage Collection Phases</h3>
+                <p class="text-light" style="margin-bottom: 16px;">Set deadlines and specific targets for each department.</p>
+                
+                <form id="phase-form" onsubmit="app.addPhaseFromForm(event)">
+                    <div class="grid-2">
+                        <div>
+                            <label>Phase Name</label>
+                            <input type="text" id="phase-name" required placeholder="e.g. March Offering">
+                        </div>
+                        <div>
+                            <label>Target Date</label>
+                            <input type="date" id="phase-date" required>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #F9FAFB; padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+                        <h4 style="margin-bottom: 12px; font-size: 0.9rem; color: var(--text-main);">Department Targets</h4>
+                        <div id="dept-targets-container" class="grid-2" style="gap: 12px;">
+                            <!-- JS will populate inputs here -->
+                        </div>
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #E5E7EB; font-weight: 600; font-size: 0.9rem; text-align: right;">
+                            Total Project Target: <span id="total-target-preview">KES 0</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="margin-top: 16px;">Create Phase</button>
+                </form>
+
+                <div style="margin-top: 32px;">
+                    <h4>Existing Phases</h4>
+                    <div id="settings-phase-list" style="margin-top: 12px;"></div>
+                </div>
+            </div>
+
+            <div class="card" style="border-color: var(--danger);">
+                <h3 style="color: var(--danger);">Danger Zone</h3>
+                <p class="text-light">Permanently delete all application data and restore default departments. This cannot be undone.</p>
+                <button class="btn btn-danger" style="margin-top: 12px;" onclick="app.hardReset()">Reset All Data</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- === MODALS === -->
+
+    <!-- 1. PLEDGE MODAL -->
+    <div class="modal-overlay" id="modal-pledge">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="pledge-modal-title">New Pledge</h3>
+                <button class="close-modal" onclick="app.closeModal('pledge')">&times;</button>
+            </div>
+            <form onsubmit="app.submitPledge(event)">
+                <div class="modal-body">
+                    <label>Member Name</label>
+                    <input type="text" name="name" required placeholder="e.g. John Doe">
+                    
+                    <label>Department</label>
+                    <select name="department" id="modal-dept-select" required>
+                        <!-- Populated by JS -->
+                    </select>
+                    
+                    <label>Pledge Amount (KES)</label>
+                    <input type="number" name="amount" required min="1" step="0.01" placeholder="0.00">
+                    
+                    <small style="color: var(--accent); display:block; margin-top:10px;">
+                        ℹ️ <strong>Note:</strong> If this specific Name + Department combination already exists, amount will be added to their existing pledge.
+                    </small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="app.closeModal('pledge')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-pledge">Save Pledge</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. EXPENSE MODAL -->
+    <div class="modal-overlay" id="modal-expense">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Record New Expense</h3>
+                <button class="close-modal" onclick="app.closeModal('expense')">&times;</button>
+            </div>
+            <form onsubmit="app.submitExpense(event)">
+                <div class="modal-body">
+                    <label>Category</label>
+                    <select id="expense-category" required>
+                        <option value="General">General</option>
+                        <option value="Logistics">Logistics (Transport/Fuel)</option>
+                        <option value="Venue">Venue/Hall Booking</option>
+                        <option value="Marketing">Marketing/Print</option>
+                        <option value="Refreshments">Refreshments/Catering</option>
+                    </select>
+
+                    <label>Description</label>
+                    <input type="text" id="expense-desc" required placeholder="e.g. Transport to venue">
+                    
+                    <label>Amount (KES)</label>
+                    <input type="number" id="expense-amount" required min="1" step="0.01" placeholder="0.00">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="app.closeModal('expense')">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Record Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. EDIT PLEDGE MODAL -->
+    <div class="modal-overlay" id="modal-edit-pledge">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Edit Pledge</h3>
+                <button class="close-modal" onclick="app.closeModal('edit-pledge')">&times;</button>
+            </div>
+            <form onsubmit="app.updatePledgeSubmit(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="edit-id">
+                    
+                    <label>Member Name</label>
+                    <input type="text" name="name" required>
+                    
+                    <label>Department</label>
+                    <select name="department" id="edit-dept-select" required>
+                        <!-- Populated by JS -->
+                    </select>
+                    
+                    <label>Pledge Amount (KES)</label>
+                    <input type="number" name="amount" required min="1" step="0.01">
+                    
+                    <small style="color: var(--accent); display:block; margin-top:10px;">
+                        ⚠️ <strong>Warning:</strong> Changing amount here sets the <em>total pledge</em>. It does not affect payments already made.
+                    </small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="app.closeModal('edit-pledge')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Pledge</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. SMS PARSER MODAL -->
+    <div class="modal-overlay" id="modal-sms-parse">
+        <div class="modal modal-lg" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>⚡ M-Pesa SMS Parser</h3>
+                <button class="close-modal" onclick="app.closeModal('sms-parse')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="text-light">Paste SMS confirmation messages below.</p>
+                <textarea id="sms-input" style="width:  100%; height: 150px; font-family: monospace; font-size: 0.85rem;" placeholder="Paste here..."></textarea>
+                
+                <div id="staged-area" class="hidden" style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px;">
+                    <div class="flex-between" style="margin-bottom: 12px;">
+                        <strong>Found Transactions (<span id="staged-count">0</span>)</strong>
+                        <small class="text-light">Review before committing</small>
+                    </div>
+                    <div id="staged-list" style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;">
+                        <!-- Staged Items go here -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="app.closeModal('sms-parse')">Close</button>
+                <button type="button" class="btn btn-primary" id="btn-parse-trigger" onclick="app.processSMS()">⚡ Extract Data</button>
+                <button type="button" class="btn btn-primary hidden" id="btn-commit-trigger" onclick="app.commitStaged()">Commit All</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. MANUAL CASH MODAL -->
+    <div class="modal-overlay" id="modal-manual-cash">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Record Manual Cash</h3>
+                <button class="close-modal" onclick="app.closeModal('manual-cash')">&times;</button>
+            </div>
+            <form onsubmit="app.submitManualCash(event)">
+                <div class="modal-body">
+                    <label>Payer Name</label>
+                    <input type="text" id="cash-name" list="member-list" required placeholder="Name">
+                    <datalist id="member-list"></datalist>
+
+                    <label>Department</label>
+                    <select id="cash-dept" required>
+                        <!-- JS Populated -->
+                    </select>
+
+                    <label>Amount (KES)</label>
+                    <input type="number" id="cash-amount" required min="1" step="0.01">
+                    
+                    <label>Reference/Note</label>
+                    <input type="text" id="cash-ref" placeholder="e.g. Offering Envelope #1">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="app.closeModal('manual-cash')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container"></div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- CONSTANTS ---
+        const DEFAULT_DEPARTMENTS = [
+            "Eagles", "Daughters of Faith", "Youth", 
+            "Kingdom Generation", "Planning Committee", "Guests"
+        ];
+        const DEPT_STORAGE_KEY = 'dcd_custom_departments';
+        const DB_KEY = 'dcd_possess_land_v18';
+
+        // --- SECURITY UTILS ---
+        function escapeHtml(unsafe) {
+            if (!unsafe) return "";
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+
+        function parseSafeFloat(val) {
+            const num = parseFloat(val);
+            return isNaN(num) || num < 0 ? 0 : num;
+        }
+
+        // --- DEPARTMENT MANAGER ---
+        const DeptManager = {
+            list: [],
+
+            init() {
+                try {
+                    const stored = localStorage.getItem(DEPT_STORAGE_KEY);
+                    this.list = stored ? JSON.parse(stored) : [...DEFAULT_DEPARTMENTS];
+                } catch (e) {
+                    console.error("Failed to load departments", e);
+                    this.list = [...DEFAULT_DEPARTMENTS];
+                    this.save();
+                }
+            },
+
+            getAll() {
+                return this.list;
+            },
+
+            ensureExists(name) {
+                if (!name) return;
+                name = name.trim();
+                const exists = this.list.some(d => d.toLowerCase() === name.toLowerCase());
+                
+                if (!exists) {
+                    this.list.push(name);
+                    this.save();
+                    return true; 
+                }
+                return false; 
+            },
+
+            save() {
+                localStorage.setItem(DEPT_STORAGE_KEY, JSON.stringify(this.list));
+            },
+
+            reset() {
+                this.list = [...DEFAULT_DEPARTMENTS];
+                this.save();
+            }
+        };
+
+        // --- STORE ---
+        const store = {
+            data: {
+                pledges: [], 
+                transactions: [], 
+                expenses: [], 
+                phases: [] 
+            },
+
+            init() {
+                try {
+                    const saved = localStorage.getItem(DB_KEY);
+                    if (saved) {
+                        this.data = JSON.parse(saved);
+                    } else {
+                        this.data.phases.push({
+                            id: Date.now(),
+                            name: "Initial Phase",
+                            totalTarget: 1000000,
+                            date: new Date().toISOString().split('T')[0],
+                            deptTargets: {} 
+                        });
+                        this.save();
+                    }
+                } catch (e) {
+                    console.error("Data corruption detected. Resetting.", e);
+                    this.hardResetInternal();
+                }
+            },
+
+            save() {
+                try {
+                    localStorage.setItem(DB_KEY, JSON.stringify(this.data));
+                } catch (e) {
+                    app.showToast("Error saving data: Storage might be full.", 'error');
+                }
+                app.render();
+            },
+
+            addPledge(name, dept, amount) {
+                const existing = this.data.pledges.find(p => 
+                    p.name.toLowerCase() === name.toLowerCase() &&
+                    p.department.toLowerCase() === dept.toLowerCase()
+                );
+                
+                if (existing) {
+                    existing.amount += amount;
+                    this.save();
+                    return existing.id;
+                } else {
+                    const id = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+                    this.data.pledges.push({
+                        id,
+                        name,
+                        department: dept,
+                        amount: amount,
+                        date: new Date().toISOString()
+                    });
+                    this.save();
+                    return id;
+                }
+            },
+
+            updatePledge(id, newData) {
+                const index = this.data.pledges.findIndex(p => p.id === id);
+                if (index > -1) {
+                    this.data.pledges[index] = { 
+                        ...this.data.pledges[index], 
+                        name: newData.name, 
+                        department: newData.department,
+                        amount: newData.amount
+                    };
+                    this.save();
+                }
+            },
+
+            deletePledge(id) {
+                const pledge = this.data.pledges.find(p => p.id === id);
+                if (pledge) {
+                    const txCount = this.data.transactions.filter(t => t.pledgeId === id).length;
+                    if (txCount > 0) {
+                        const proceed = confirm(`This pledge has ${txCount} payments. Deleting it will remove them from the ledger. Continue?`);
+                        if (!proceed) return;
+                    }
+                }
+                this.data.pledges = this.data.pledges.filter(p => p.id !== id);
+                this.save();
+            },
+
+            addTransaction(tx) {
+                this.data.transactions.unshift({
+                    id: Date.now().toString(),
+                    ...tx,
+                    date: new Date().toISOString()
+                });
+                this.save();
+            },
+
+            addExpense(desc, amount, category) {
+                this.data.expenses.push({
+                    id: Date.now().toString(),
+                    description: desc,
+                    amount: amount,
+                    category,
+                    date: new Date().toISOString()
+                });
+                this.save();
+            },
+
+            addPhase(name, date, deptTargets) {
+                const total = Object.values(deptTargets).reduce((a,b) => a+b, 0);
+                this.data.phases.push({
+                    id: Date.now(),
+                    name, 
+                    totalTarget: total, 
+                    date,
+                    deptTargets
+                });
+                this.data.phases.sort((a,b) => new Date(a.date) - new Date(b.date));
+                this.save();
+            },
+
+            deletePhase(id) {
+                this.data.phases = this.data.phases.filter(p => p.id !== id);
+                this.save();
+            },
+
+            hardResetInternal() {
+                localStorage.removeItem(DB_KEY);
+                location.reload();
+            }
+        };
+
+        // --- APP CONTROLLER ---
+        window.app = {
+            stagedTx: [],
+
+            init() {
+                DeptManager.init();
+                store.init();
+                this.populateDeptSelects();
+                this.renderSettingsForm();
+                this.render();
+            },
+
+            router(viewId) {
+                document.querySelectorAll('main > section').forEach(el => el.classList.add('hidden'));
+                document.getElementById(`view-${viewId}`).classList.remove('hidden');
+                
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                const map = { 'dashboard':0, 'pledges':1, 'ledger':2, 'expenses':3, 'tribes':4, 'settings':5 };
+                const navItems = document.querySelectorAll('.nav-item');
+                if(navItems[map[viewId]]) {
+                    navItems[map[viewId]].classList.add('active');
+                }
+            },
+
+            openModal(type) {
+                const el = document.getElementById(`modal-${type}`);
+                if(el) el.classList.add('open');
+            },
+            closeModal(type) {
+                const el = document.getElementById(`modal-${type}`);
+                if(el) el.classList.remove('open');
+                if(type === 'sms-parse') {
+                    document.getElementById('sms-input').value = '';
+                    document.getElementById('staged-area').classList.add('hidden');
+                    document.getElementById('btn-parse-trigger').classList.remove('hidden');
+                    document.getElementById('btn-commit-trigger').classList.add('hidden');
+                    document.getElementById('btn-parse-trigger').innerText = "⚡ Extract Data";
+                    this.stagedTx = [];
+                }
+            },
+
+            populateDeptSelects() {
+                const depts = DeptManager.getAll();
+                const opts = depts.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
+                
+                ['modal-dept-select', 'edit-dept-select', 'cash-dept'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.innerHTML = opts;
+                });
+
+                this.renderSettingsForm();
+                
+                const names = [...new Set(store.data.pledges.map(p => p.name))];
+                const memberList = document.getElementById('member-list');
+                if(memberList) memberList.innerHTML = names.map(n => `<option value="${escapeHtml(n)}">`).join('');
+            },
+
+            renderSettingsForm() {
+                const container = document.getElementById('dept-targets-container');
+                if(container) {
+                    container.innerHTML = '';
+                    DeptManager.getAll().forEach(dept => {
+                        const div = document.createElement('div');
+                        div.className = 'input-group';
+                        div.innerHTML = `
+                            <label>${escapeHtml(dept)} Target</label>
+                            <input type="number" id="targ-${dept.replace(/\s/g, '')}" class="dept-target-input" placeholder="0" min="0" oninput="app.updateTotalPreview()">
+                        `;
+                        container.appendChild(div);
+                    });
+                }
+            },
+
+            updateTotalPreview() {
+                let total = 0;
+                document.querySelectorAll('.dept-target-input').forEach(inp => total += Number(inp.value) || 0);
+                const preview = document.getElementById('total-target-preview');
+                if(preview) preview.innerText = app.formatMoney(total);
+            },
+
+            addPhaseFromForm(e) {
+                e.preventDefault();
+                const name = document.getElementById('phase-name').value;
+                const date = document.getElementById('phase-date').value;
+                
+                const targets = {};
+                DeptManager.getAll().forEach(dept => {
+                    const val = document.getElementById(`targ-${dept.replace(/\s/g, '')}`).value;
+                    targets[dept] = Number(val) || 0;
+                });
+
+                store.addPhase(name, date, targets);
+                this.showToast('Phase created', 'success');
+                document.getElementById('phase-form').reset();
+                this.updateTotalPreview();
+            },
+
+            submitPledge(e) {
+                e.preventDefault();
+                const form = e.target;
+                const amount = parseSafeFloat(form.amount.value);
+                
+                if(amount <= 0) {
+                    this.showToast("Amount must be greater than 0", "error");
+                    return;
+                }
+
+                store.addPledge(form.name.value, form.department.value, amount);
+                this.closeModal('pledge');
+                form.reset();
+            },
+
+            submitManualCash(e) {
+                e.preventDefault();
+                const name = document.getElementById('cash-name').value;
+                const dept = document.getElementById('cash-dept').value;
+                const amount = parseSafeFloat(document.getElementById('cash-amount').value);
+                const ref = document.getElementById('cash-ref').value || 'Manual Cash';
+                const timestamp = new Date(); 
+
+                if(amount <= 0) {
+                    this.showToast("Amount must be greater than 0", "error");
+                    return;
+                }
+
+                const dupe = this.checkDuplicate(name, dept, amount, timestamp);
+                if (dupe) {
+                    this.showToast(`Duplicate: Same amount from ${name} (${dept}) within 30 minutes.`, 'error');
+                    return;
+                }
+
+                let pledge = store.data.pledges.find(p => 
+                    p.name.toLowerCase() === name.toLowerCase() &&
+                    p.department.toLowerCase() === dept.toLowerCase()
+                );
+                
+                if (!pledge) {
+                    const pid = store.addPledge(name, dept, amount);
+                    pledge = store.data.pledges.find(p => p.id === pid);
+                }
+
+                store.addTransaction({
+                    pledgeId: pledge.id,
+                    name: pledge.name,
+                    department: dept,
+                    amount: amount,
+                    type: 'credit',
+                    method: 'Cash',
+                    ref: ref,
+                    date: timestamp.toISOString()
+                });
+
+                this.closeModal('manual-cash');
+                this.showToast('Payment recorded!', 'success');
+                e.target.reset();
+            },
+
+            submitExpense(e) {
+                e.preventDefault();
+                const desc = document.getElementById('expense-desc').value;
+                const amount = parseSafeFloat(document.getElementById('expense-amount').value);
+                const category = document.getElementById('expense-category').value;
+
+                if(amount <= 0) {
+                    this.showToast("Amount must be greater than 0", "error");
+                    return;
+                }
+
+                store.addExpense(desc, amount, category);
+                this.closeModal('expense');
+                e.target.reset();
+                this.showToast('Expense recorded', 'error'); 
+            },
+
+            editPledge(id) {
+                const pledge = store.data.pledges.find(p => p.id === id);
+                if(!pledge) return;
+
+                document.getElementById('edit-id').value = pledge.id;
+                document.querySelector('#modal-edit-pledge [name="name"]').value = pledge.name;
+                document.querySelector('#modal-edit-pledge [name="department"]').value = pledge.department;
+                document.querySelector('#modal-edit-pledge [name="amount"]').value = pledge.amount;
+
+                this.openModal('edit-pledge');
+            },
+
+            updatePledgeSubmit(e) {
+                e.preventDefault();
+                const id = document.getElementById('edit-id').value;
+                const form = e.target;
+                
+                const amount = parseSafeFloat(form.amount.value);
+                if(amount <= 0) {
+                    this.showToast("Amount must be greater than 0", "error");
+                    return;
+                }
+
+                const newData = {
+                    name: form.name.value,
+                    department: form.department.value,
+                    amount: amount
+                };
+
+                store.updatePledge(id, newData);
+                this.closeModal('edit-pledge');
+                this.showToast('Pledge updated successfully', 'success');
+            },
+
+            deletePledge(id) {
+                if(confirm("Are you sure you want to delete this pledge?")) {
+                    store.deletePledge(id);
+                }
+            },
+
+            hardReset() {
+                if(confirm("Are you absolutely sure? This deletes all data and custom departments.")) {
+                    DeptManager.reset();
+                    store.hardResetInternal();
+                }
+            },
+
+            // --- FEATURE 1: BACKUP & RESTORE ---
+            downloadBackup() {
+                try {
+                    const backupData = {
+                        version: 1.0,
+                        timestamp: new Date().toISOString(),
+                        departments: DeptManager.getAll(),
+                        data: store.data
+                    };
+
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+                    const link = document.createElement("a");
+                    link.setAttribute("href", dataStr);
+                    link.setAttribute("download", `DCD_Backup_${new Date().toISOString().slice(0,10)}.json`);
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    
+                    this.showToast("Backup downloaded successfully", 'success');
+                } catch (e) {
+                    console.error(e);
+                    this.showToast("Error creating backup", 'error');
+                }
+            },
+
+            restoreBackup(input) {
+                const file = input.files[0];
+                if(!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const json = JSON.parse(e.target.result);
+                        
+                        // Basic validation
+                        if(!json.departments || !json.data) {
+                            throw new Error("Invalid backup file format");
+                        }
+
+                        if(confirm("Restoring will OVERWRITE your current data and departments. This cannot be undone. Proceed?")) {
+                            // Restore Departments
+                            DeptManager.list = json.departments;
+                            DeptManager.save();
+
+                            // Restore Data
+                            store.data = json.data;
+                            store.save();
+
+                            this.showToast("Backup restored! Reloading...", "success");
+                            setTimeout(() => location.reload(), 1000);
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        this.showToast("Failed to restore backup. File may be corrupted.", "error");
+                    }
+                };
+                reader.readAsText(file);
+                // Reset input so same file can be selected again if needed
+                input.value = '';
+            },
+
+            // --- CSV IMPORT LOGIC ---
+            handleCSVUpload(input) {
+                const file = input.files[0];
+                if(!file) return;
+
+                try {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const text = e.target.result;
+                            if(!text) throw new Error("File is empty");
+                            
+                            const lines = text.split('\n');
+                            let count = 0;
+                            let newDeptCount = 0;
+                            
+                            lines.forEach((line, index) => {
+                                if(!line.trim()) return;
+
+                                const parts = line.split(',');
+                                
+                                if(parts.length >= 3) {
+                                    const name = parts[0].trim();
+                                    const dept = parts[1].trim();
+                                    const amountStr = parts[2].trim();
+                                    const amount = parseFloat(amountStr);
+
+                                    if(isNaN(amount) || amount <= 0) return;
+                                    
+                                    if(name.toLowerCase().includes('name') && amountStr.toLowerCase().includes('amount')) return;
+
+                                    if(DeptManager.ensureExists(dept)) {
+                                        newDeptCount++;
+                                    }
+                                    
+                                    store.addPledge(name, dept, amount);
+                                    count++;
+                                }
+                            });
+
+                            this.populateDeptSelects(); 
+
+                            let msg = `Imported/Updated ${count} pledges.`;
+                            if(newDeptCount > 0) msg += ` Created ${newDeptCount} new departments.`;
+                            
+                            this.showToast(msg, 'success');
+                            input.value = ''; 
+                        } catch (err) {
+                            console.error(err);
+                            this.showToast("Error parsing CSV content. Check format.", 'error');
+                        }
+                    };
+                    reader.onerror = () => this.showToast("Error reading file.", 'error');
+                    reader.readAsText(file);
+                } catch (err) {
+                    this.showToast("Error processing file upload.", 'error');
+                }
+            },
+
+            checkDuplicate(name, dept, amount, dateObj) {
+                const THIRTY_MINS = 30 * 60 * 1000;
+                const checkTime = dateObj.getTime();
+                return store.data.transactions.some(t => {
+                    const isSamePerson = t.name.toLowerCase() === name.toLowerCase() && 
+                                         t.department.toLowerCase() === dept.toLowerCase();
+                    const isSameAmount = Math.abs(t.amount - amount) < 0.01;
+                    const txTime = new Date(t.date).getTime();
+                    const isRecent = Math.abs(txTime - checkTime) < THIRTY_MINS;
+                    return isSamePerson && isSameAmount && isRecent;
+                });
+            },
+
+            processSMS() {
+                const btn = document.getElementById('btn-parse-trigger');
+                btn.innerText = "Analyzing...";
+                try {
+                    const text = document.getElementById('sms-input').value;
+                    if(!text.trim()) {
+                        alert("Please paste text first.");
+                        btn.innerText = "⚡ Extract Data";
+                        return;
+                    }
+                    const lines = text.split('\n');
+                    const results = [];
+                    lines.forEach((line) => {
+                        const amtMatch = line.match(/Ksh\s*([\d,]+\.?\d*)/i);
+                        if(!amtMatch) return; 
+                        const amount = parseFloat(amtMatch[1].replace(/,/g, ''));
+                        const isPersonal = line.toLowerCase().includes('received');
+                        const isTill = line.toLowerCase().includes('sent to');
+                        
+                        if (isPersonal) {
+                            const onIndex = line.indexOf(' on ');
+                            if (onIndex === -1) {
+                                const dateFallback = line.match(/\d{1,2}\/\d{1,2}\/\d{2,4}\s+at\s+\d{1,2}:\d{2}\s*(AM|PM)/i);
+                                if(dateFallback) {
+                                    const dateObj = this.parseSmartMpesaDate(dateFallback[0]);
+                                    if(dateObj) {
+                                        const nameMatch = line.match(/from\s+(.*?)\s+\d{1,2}\/\d{1,2}/i);
+                                        let name = "Unknown";
+                                        if(nameMatch) name = nameMatch[1].trim();
+                                        results.push({ amount, name, method: 'M-Pesa', ref: 'SMS-' + Math.floor(Math.random()*10000), date: dateObj });
+                                    }
+                                }
+                            } else {
+                                const parts = line.split('from');
+                                if(parts.length < 2) return;
+                                const rest = parts[1];
+                                const onIndexRest = rest.indexOf(' on ');
+                                if(onIndexRest === -1) return; 
+                                let rawName = rest.substring(0, onIndexRest).trim();
+                                const dateStr = rest.substring(onIndexRest + 4); 
+                                rawName = rawName.replace(/\s+\d{10,}$/, '');
+                                const dateObj = this.parseSmartMpesaDate(dateStr);
+                                if(dateObj) {
+                                    results.push({ amount, name: rawName, method: 'M-Pesa', ref: 'SMS-' + Math.floor(Math.random()*10000), date: dateObj });
+                                }
+                            }
+                        } else if (isTill) {
+                            const tillMatch = line.match(/sent to\s+([A-Z0-9\s]+?)\s+for account/i);
+                            if(tillMatch) {
+                                 const onIndex = line.indexOf(' on ');
+                                 const dateStr = onIndex > -1 ? line.substring(onIndex + 4) : '';
+                                 const dateObj = dateStr ? this.parseSmartMpesaDate(dateStr) : new Date();
+                                 results.push({ amount, name: tillMatch[1].trim(), method: 'Till/Paybill', ref: 'TILL-' + Math.floor(Math.random()*10000), date: dateObj });
+                            }
+                        }
+                    });
+
+                    if (results.length === 0) {
+                        alert("No valid M-Pesa messages found in text.");
+                        btn.innerText = "⚡ Extract Data";
+                        return;
+                    }
+
+                    this.stagedTx = results;
+                    this.renderStaged();
+                    document.getElementById('staged-area').classList.remove('hidden');
+                    document.getElementById('btn-parse-trigger').classList.add('hidden');
+                    document.getElementById('btn-commit-trigger').classList.remove('hidden');
+                    btn.innerText = "⚡ Extract Data";
+
+                } catch(err) {
+                    console.error("Parser Crash:", err);
+                    alert("Critical Error: " + err.message);
+                    btn.innerText = "⚡ Extract Data";
+                }
+            },
+
+            parseSmartMpesaDate(str) {
+                if(!str) return null;
+                const parts = str.match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})\s+at\s+(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+                if(!parts) return null;
+                const day = parseInt(parts[1]);
+                let month = parseInt(parts[2]) - 1; 
+                let year = parseInt(parts[3]);
+                if(year < 100) year += 2000;
+                let hours = parseInt(parts[4]);
+                const mins = parseInt(parts[5]);
+                if (parts[6].toUpperCase() === 'PM' && hours !== 12) hours += 12;
+                if (parts[6].toUpperCase() === 'AM' && hours === 12) hours = 0;
+                return new Date(year, month, day, hours, mins);
+            },
+
+            renderStaged() {
+                const list = document.getElementById('staged-list');
+                document.getElementById('staged-count').innerText = this.stagedTx.length;
+                list.innerHTML = '';
+                this.stagedTx.forEach((tx, idx) => {
+                    const existing = store.data.pledges.find(p => p.name.toLowerCase() === tx.name.toLowerCase());
+                    let deptSelect = '';
+                    if (existing) {
+                        deptSelect = `<span class="badge badge-success">${escapeHtml(existing.department)}</span>`;
+                        tx.assignedDept = existing.department;
+                    } else {
+                        const depts = DeptManager.getAll();
+                        const options = depts.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
+                        deptSelect = `
+                            <select onchange="app.stagedTx[${idx}].assignedDept = this.value" style="padding:4px; margin: 0; font-size: 0.8rem;">
+                                <option value="">Select Dept...</option>
+                                ${options}
+                            </select>
+                        `;
+                    }
+                    list.innerHTML += `
+                        <div class="card" style="padding: 12px; margin-bottom: 8px; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="font-weight:700;">${escapeHtml(tx.name)}</div>
+                                <div style="font-size:0.85rem; color:var(--text-light);">${tx.method} • ${this.formatDate(tx.date)}</div>
+                            </div>
+                            <div class="text-right">
+                                <div style="font-weight:700; color:var(--primary);">${this.formatMoney(tx.amount)}</div>
+                                <div style="margin-top:4px;">${deptSelect}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            },
+
+            commitStaged() {
+                let count = 0;
+                this.stagedTx.forEach(tx => {
+                    if(!tx.assignedDept) {
+                        this.showToast(`Skipped ${tx.name}: No Department selected`, 'error');
+                        return;
+                    }
+                    
+                    DeptManager.ensureExists(tx.assignedDept);
+
+                    const dupe = this.checkDuplicate(tx.name, tx.assignedDept, tx.amount, tx.date);
+                    if (dupe) {
+                        this.showToast(`Duplicate Skipped: ${tx.name} (${tx.assignedDept})`, 'error');
+                        return;
+                    }
+                    let pledge = store.data.pledges.find(p => 
+                        p.name.toLowerCase() === tx.name.toLowerCase() &&
+                        p.department.toLowerCase() === tx.assignedDept.toLowerCase()
+                    );
+                    if(!pledge) {
+                        const pid = store.addPledge(tx.name, tx.assignedDept, tx.amount);
+                        pledge = store.data.pledges.find(p => p.id === pid);
+                    }
+                    store.addTransaction({
+                        pledgeId: pledge.id,
+                        name: pledge.name,
+                        department: tx.assignedDept,
+                        amount: tx.amount,
+                        type: 'credit',
+                        method: tx.method,
+                        ref: tx.ref,
+                        date: tx.date.toISOString() 
+                    });
+                    count++;
+                });
+                if(count > 0) {
+                    this.showToast(`Successfully committed ${count} transactions!`, 'success');
+                    this.closeModal('sms-parse');
+                    this.populateDeptSelects(); 
+                } else {
+                    this.showToast('No transactions committed.', 'error');
+                }
+            },
+
+            // --- RENDER FUNCTIONS ---
+            render() {
+                try {
+                    this.renderDashboard();
+                    this.renderPledges();
+                    this.renderExpenses();
+                    this.renderLedger();
+                    this.renderTribes();
+                    this.renderSettingsList();
+                    this.populateDeptSelects();
+                } catch(e) {
+                    console.error("Render Error:", e);
+                }
+            },
+
+            renderDashboard() {
+                const totalCash = store.data.transactions.reduce((sum, t) => sum + t.amount, 0);
+                const totalExpenses = store.data.expenses.reduce((sum, e) => sum + e.amount, 0);
+                const netCash = totalCash - totalExpenses;
+                const totalPledges = store.data.pledges.reduce((sum, p) => sum + p.amount, 0);
+                const rate = totalPledges ? Math.round((netCash / totalPledges) * 100) : 0;
+                const uniqueDonors = new Set(store.data.transactions.map(t => t.pledgeId)).size;
+
+                document.getElementById('dash-cash').innerText = this.formatMoney(totalCash);
+                document.getElementById('dash-expenses').innerText = this.formatMoney(totalExpenses);
+                document.getElementById('dash-net').innerText = this.formatMoney(netCash);
+                document.getElementById('dash-pledges').innerText = this.formatMoney(totalPledges);
+                document.getElementById('dash-rate').innerText = rate + '%';
+                const donorEl = document.getElementById('dash-donors');
+                if(donorEl) donorEl.innerText = uniqueDonors;
+
+                const phaseContainer = document.getElementById('phase-list');
+                phaseContainer.innerHTML = '';
+                store.data.phases.forEach(phase => {
+                    const pct = Math.min(100, Math.round((totalCash / phase.totalTarget) * 100));
+                    phaseContainer.innerHTML += `
+                        <div class="progress-wrapper">
+                            <div class="progress-info">
+                                <span>${escapeHtml(phase.name)} <small style="font-weight:400; color:#666;">(${this.formatDate(phase.date)})</small></span>
+                                <span>${pct}%</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill ${pct < 50 ? 'warn' : ''}" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                const recent = document.getElementById('recent-activity');
+                const txs = store.data.transactions.slice(0, 5);
+                if(txs.length === 0) {
+                    recent.innerHTML = '<p class="text-light" style="text-align:center;">No recent activity.</p>';
+                } else {
+                    recent.innerHTML = txs.map(t => `
+                        <div class="flex-between" style="padding-bottom:8px; border-bottom: 1px solid #eee;">
+                            <div>
+                                <div style="font-weight:600;">${escapeHtml(t.name)}</div>
+                                <small class="text-light">${t.method} • ${this.formatDateTime(t.date)}</small>
+                            </div>
+                            <div style="font-weight: 700; color:var(--primary);">+${this.formatMoney(t.amount)}</div>
+                        </div>
+                    `).join('');
+                }
+            },
+
+            renderPledges() {
+                const tbody = document.getElementById('pledges-table-body');
+                const search = document.getElementById('pledge-search').value.toLowerCase();
+                let html = '';
+                store.data.pledges.forEach(p => {
+                    if(p.name.toLowerCase().includes(search)) {
+                        const paid = store.data.transactions
+                            .filter(t => t.pledgeId === p.id)
+                            .reduce((sum, t) => sum + t.amount, 0);
+                        const balance = p.amount - paid;
+                        const status = balance <= 0 
+                            ? '<span class="badge badge-success">Completed</span>' 
+                            : '<span class="badge badge-warn">Active</span>';
+
+                        html += `
+                            <tr>
+                                <td><strong>${escapeHtml(p.name)}</strong></td>
+                                <td>${escapeHtml(p.department)}</td>
+                                <td class="text-right">${this.formatMoney(p.amount)}</td>
+                                <td class="text-right">${this.formatMoney(paid)}</td>
+                                <td class="text-right" style="color:${balance > 0 ? 'var(--danger)' : 'var(--text-light)'}">${this.formatMoney(balance)}</td>
+                                <td class="text-right">${status}</td>
+                                <td class="text-right">
+                                    <button class="btn-icon" onclick="app.editPledge('${p.id}')" title="Edit">✎️</button>
+                                    <button class="btn-icon" onclick="app.deletePledge('${p.id}')" style="margin-left:8px; color:var(--danger);" title="Delete">🗑</button>
+                                </td>
+                            </tr>
+                        `;
+                    }
+                });
+                tbody.innerHTML = html;
+            },
+
+            renderExpenses() {
+                const tbody = document.getElementById('expenses-table-body');
+                if(store.data.expenses.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">No expenses recorded.</td></tr>';
+                    return;
+                }
+                const sortedExp = [...store.data.expenses].sort((a, b) => new Date(a.date) - new Date(b.date));
+                tbody.innerHTML = sortedExp.map(e => `
+                    <tr>
+                        <td style="font-size:0.85rem; color:var(--text-light);">${this.formatDate(e.date)}</td>
+                        <td><span class="badge badge-warn">${escapeHtml(e.category)}</span></td>
+                        <td>${escapeHtml(e.description)}</td>
+                        <td class="money-negative">-${this.formatMoney(e.amount)}</td>
+                        <td><button class="btn btn-sm btn-danger" onclick="alert('Expenses cannot be deleted in this version (placeholder feature)')">📄</button></td>
+                    </tr>
+                `).join('');
+            },
+
+            renderLedger() {
+                const tbody = document.getElementById('ledger-table-body');
+                if(store.data.transactions.length === 0 && store.data.expenses.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">No transactions found.</td></tr>';
+                    return;
+                }
+                const ledgerRows = [
+                    ...store.data.transactions.map(t => ({...t, kind: 'credit', color: ''})),
+                    ...store.data.expenses.map(e => ({...e, kind: 'debit', color: 'money-negative', category: e.category}))
+                ].sort((a, b) => new Date(a.date) - new Date(b.date));
+                tbody.innerHTML = ledgerRows.map(t => `
+                    <tr>
+                        <td style="font-size:0.85rem; color:var(--text-light);">${this.formatDateTime(t.date)}</td>
+                        <td style="font-family:monospace;">${t.ref || 'EXP-' + t.id.substr(-4)}</td>
+                        <td>${escapeHtml(t.description || t.name)}</td>
+                        <td><span class="badge ${t.kind === 'credit' ? 'badge-success' : 'badge-warn'}">${t.kind}</span></td>
+                        <td class="${t.kind === 'debit' ? 'money-negative' : ''}">${this.formatMoney(t.amount)}</td>
+                    </tr>
+                `).join('');
+            },
+
+            renderTribes() {
+                const container = document.getElementById('tribes-container');
+                const activePhase = store.data.phases[store.data.phases.length - 1];
+                const depts = DeptManager.getAll();
+                
+                const deptStats = depts.map(dept => {
+                    const deptPledges = store.data.pledges.filter(p => p.department === dept);
+                    const target = deptPledges.reduce((sum, p) => sum + p.amount, 0);
+                    
+                    const pIds = deptPledges.map(p => p.id);
+                    const collected = store.data.transactions
+                        .filter(t => pIds.includes(t.pledgeId) && t.type === 'credit') 
+                        .reduce((sum, t) => sum + t.amount, 0);
+
+                    const spent = store.data.expenses
+                        .filter(e => e.category === dept) 
+                        .reduce((sum, e) => sum + e.amount, 0);
+
+                    const net = collected - spent;
+                    const phaseTarget = (activePhase && activePhase.deptTargets && activePhase.deptTargets[dept]) 
+                        ? activePhase.deptTargets[dept] 
+                        : target;
+
+                    const pct = phaseTarget ? Math.round((net / phaseTarget) * 100) : 0;
+                    return { dept, target, collected, net, pct, phaseTarget };
+                }).sort((a,b) => b.net - a.net); 
+                
+                container.innerHTML = deptStats.map((d, i) => `
+                    <div class="card">
+                        <div class="flex-between" style="margin-bottom: 12px;">
+                            <h3>#${i+1} ${escapeHtml(d.dept)}</h3>
+                            <span style="font-weight:700; color:var(--primary);">${d.pct}%</span>
+                        </div>
+                        <div class="progress-track" style="margin-bottom:12px;">
+                            <div class="progress-fill" style="width: ${d.pct}%"></div>
+                        </div>
+                        <div class="flex-between" style="font-size: 0.9rem;">
+                            <span class="text-light">Net Cash</span>
+                            <strong>${this.formatMoney(d.net)}</strong>
+                        </div>
+                        <div class="flex-between" style="font-size: 0.9rem;">
+                            <span class="text-light">Phase Target</span>
+                            <strong>${this.formatMoney(d.phaseTarget)}</strong>
+                        </div>
+                        ${d.phaseTarget !== d.target ? `
+                        <div class="flex-between" style="font-size: 0.85rem; margin-top: 4px; color:#9CA3AF;">
+                            <span>(Pledged: ${this.formatMoney(d.target)})</span>
+                        </div>` : ''}
+                    </div>
+                `).join('');
+            },
+
+            renderSettingsList() {
+                const list = document.getElementById('settings-phase-list');
+                list.innerHTML = store.data.phases.map(p => `
+                    <div class="flex-between" style="padding: 12px; background: #f9fafb; margin-bottom: 8px; border-radius: 6px;">
+                        <div>
+                            <strong>${escapeHtml(p.name)}</strong>
+                            <div class="text-light" style="font-size: 0.8rem;">Target: ${this.formatMoney(p.totalTarget)} • ${this.formatDate(p.date)}</div>
+                        </div>
+                        <button class="btn btn-sm btn-danger" onclick="store.deletePhase(${p.id})">Delete</button>
+                    </div>
+                `).join('');
+            },
+
+            // --- UTILS ---
+            formatMoney(amount) {
+                return 'KES ' + amount.toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            },
+
+            formatDate(isoStr) {
+                return new Date(isoStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            },
+
+            formatDateTime(isoStr) {
+                const d = new Date(isoStr);
+                return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) + 
+                       ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            },
+
+            showToast(msg, type = 'success') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = type === 'success' ? '✅ ' + msg : '⚠️ ' + msg;
+                container.appendChild(toast);
+
+                void toast.offsetWidth;
+                toast.classList.add('show');
+
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }, 4000);
+            },
+
+            exportCSV(type) {
+                let csv = [];
+                if(type === 'pledges') {
+                    csv.push(['Name', 'Department', 'Pledged', 'Paid', 'Balance']);
+                    store.data.pledges.forEach(p => {
+                        const paid = store.data.transactions.filter(t => t.pledgeId === p.id).reduce((s,t)=>s+t.amount,0);
+                        const cleanName = `"${p.name.replace(/"/g, '""')}"`;
+                        const cleanDept = `"${p.department.replace(/"/g, '""')}"`;
+                        csv.push([cleanName, cleanDept, p.amount, paid, p.amount-paid]);
+                    });
+                } else if (type === 'expenses') {
+                    csv.push(['Date', 'Category', 'Description', 'Amount']);
+                    store.data.expenses.forEach(e => {
+                        const cleanDesc = `"${e.description.replace(/"/g, '""')}"`;
+                        csv.push([e.date, e.category, cleanDesc, e.amount]);
+                    });
+                }
+
+                const csvContent = "data:text/csv;charset=utf-8," + csv.map(e => e.join(",")).join("\n");
+                const link = document.createElement("a");
+                link.setAttribute("href", encodeURI(csvContent));
+                link.setAttribute("download", `DCD_${type}_${Date.now()}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            }
+        };
+
+        // Start App
+        app.init();
+
+    </script>
+</body>
+</html>
